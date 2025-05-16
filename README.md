@@ -67,7 +67,7 @@ Execute o seguinte comando na raiz do projeto backend:
 Pré-requisitos: Java 17
 
 # clonar repositório
-git clone https://github.com/JacquelineCasali/Sistema-de-Agendamento-Telef-nico.git
+git clone https://github.com/JacquelineCasali/Sistema-de-Agendamento-Telefonico-java.git
 
 # executar o projeto
 ./mvnw spring-boot:run

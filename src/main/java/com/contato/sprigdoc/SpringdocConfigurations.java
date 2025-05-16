@@ -13,7 +13,7 @@ public class SpringdocConfigurations {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 //@OpenAPIDefinition(
-                .info(new Info().title("Sistema de Gestão")
+                .info(new Info().title("Sistema de Agendamento Telefônico")
                         .description("Api responsável fazer CRUD e validações")
                         .version("1")
                 )
