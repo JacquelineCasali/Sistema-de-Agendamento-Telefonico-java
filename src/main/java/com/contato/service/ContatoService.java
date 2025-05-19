@@ -23,8 +23,6 @@ public class ContatoService {
     public Contato salvar(ContatoDTO dto) {
 // armazena varias mensagens de erro
         List<String> erros = new ArrayList<>();
-
-
         if (contatoRepository.existsByContatoNomeOrContatoEmail(
                 dto.getContatoNome(),
                 dto.getContatoEmail())) {
@@ -35,14 +33,12 @@ public class ContatoService {
             erros.add("Número de celular já cadastrado");
         }
 
-
         String contatoCelular = dto.getContatoCelular().replaceAll("[^0-9]", "");
         if (contatoCelular.length() != 11) {
             erros.add("O número do celular deve conter 11 digitos!");
 
         }
         String contatoTelefone = dto.getContatoTelefone().replaceAll("[^0-9]", "");
-
         if (!contatoTelefone.isEmpty() && contatoTelefone.length() != 10) {
             erros.add("O número do telefone tem 10 dígitos!");
         }
@@ -65,10 +61,51 @@ public class ContatoService {
         return contatoRepository.findAll();
     }
 
-    public Contato buscarPorId(Long id) {
-        return contatoRepository.findById(id)
+    public Contato buscarPorId(Long contatoId) {
+        return contatoRepository.findById(contatoId)
                 .orElseThrow(() -> new ContatoNaoEncontradoException("Contato não encontrado!"));
     }
+public  Contato enditarContato (Long contatoId, ContatoDTO dto){
+        Contato contato = contatoRepository.findById(contatoId).orElseThrow(() -> new ContatoNaoEncontradoException("Contato não encontrado com o ID: " + contatoId));
+    List<String> erros = new ArrayList<>();
+    if (contatoRepository.existsByContatoNomeOrContatoEmail(
+            dto.getContatoNome(),
+            dto.getContatoEmail())) {
+        erros.add("Já existe um contato com esse nome ou email");
 
+    }
+    if (contatoRepository.existsByContatoCelular(dto.getContatoCelular())) {
+        erros.add("Número de celular já cadastrado");
+    }
 
+    String contatoCelular = dto.getContatoCelular().replaceAll("[^0-9]", "");
+    if (contatoCelular.length() != 11) {
+        erros.add("O número do celular deve conter 11 digitos!");
+
+    }
+    String contatoTelefone = dto.getContatoTelefone().replaceAll("[^0-9]", "");
+    if (!contatoTelefone.isEmpty() && contatoTelefone.length() != 10) {
+        erros.add("O número do telefone tem 10 dígitos!");
+    }
+    if (!erros.isEmpty()) {
+        throw new MultiplasRegrasException(erros);
+    }
+
+    contato.setContatoNome(dto.getContatoNome());
+    contato.setContatoEmail(dto.getContatoEmail());
+    contato.setContatoCelular(contatoCelular);
+    contato.setContatoTelefone(dto.getContatoTelefone());
+    contato.setContatoSnFavorito(dto.getContatoSnFavorito() != null ? dto.getContatoSnFavorito() : "N");
+    contato.setContatoSnAtivo("S");
+    contato.setContatoDhCad(LocalDateTime.now());
+    return contatoRepository.save(contato);
+    }
+
+    public void desativarContato(Long contatoId) {
+        Contato contato = contatoRepository.findById(contatoId)
+                .orElseThrow(() -> new ContatoNaoEncontradoException("Contato com ID " + contatoId + " não encontrado."));
+
+        contato.setContatoSnAtivo("N");
+        contatoRepository.save(contato);
+    }
 }

@@ -19,8 +19,8 @@ public class ContatoController {
     private ContatoService contatoService;
 
     @PostMapping
-    public ResponseEntity<Contato> criar (@RequestBody @Valid ContatoDTO dto){
-        Contato contato =this.contatoService.salvar(dto);
+    public ResponseEntity<Contato> criar(@RequestBody @Valid ContatoDTO dto) {
+        Contato contato = this.contatoService.salvar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(contato);
     }
 
@@ -29,9 +29,24 @@ public class ContatoController {
         List<Contato> contatos = contatoService.listarTodos();
         return ResponseEntity.ok(contatos);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<Contato> buscarContato(@PathVariable Long id) {
         return ResponseEntity.ok(contatoService.buscarPorId(id));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Contato> atualizarContato(@PathVariable Long contatoId, @RequestBody @Valid ContatoDTO dto) {
+
+        Contato contatoAtualizado = this.contatoService.enditarContato(contatoId, dto);
+        return ResponseEntity.ok(contatoAtualizado);
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desativarContato(@PathVariable Long contatoId) {
+        contatoService.desativarContato(contatoId);
+        return ResponseEntity.noContent().build();
+
+    }
 }
