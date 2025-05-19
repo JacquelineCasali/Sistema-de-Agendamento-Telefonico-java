@@ -2,12 +2,15 @@ package com.contato.service;
 
 import com.contato.domain.Contato;
 import com.contato.dto.ContatoDTO;
+import com.contato.infra.exceptions.ContatoNaoEncontradoException;
+import com.contato.infra.exceptions.MultiplasRegrasException;
 import com.contato.repository.ContatoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,19 +21,33 @@ public class ContatoService {
     private ContatoRepository contatoRepository;
 
     public Contato salvar(ContatoDTO dto) {
+// armazena varias mensagens de erro
+        List<String> erros = new ArrayList<>();
 
-        String contatoCelular = dto.getContatoCelular().replaceAll("[^0-9]", "");
-        if (contatoCelular.length() < 11) {
-            throw new RuntimeException("Celular deve ter 11 digitos!");
-
-        }
 
         if (contatoRepository.existsByContatoNomeOrContatoEmail(
                 dto.getContatoNome(),
                 dto.getContatoEmail())) {
-            throw new RuntimeException("Já existe um contato com esse nome ou email");
-        } else if (contatoRepository.existsByContatoCelular(dto.getContatoCelular())) {
-            throw new RuntimeException("Já existe um contato com esse celular");
+            erros.add("Já existe um contato com esse nome ou email");
+
+        }
+        if (contatoRepository.existsByContatoCelular(dto.getContatoCelular())) {
+            erros.add("Número de celular já cadastrado");
+        }
+
+
+        String contatoCelular = dto.getContatoCelular().replaceAll("[^0-9]", "");
+        if (contatoCelular.length() != 11) {
+            erros.add("O número do celular deve conter 11 digitos!");
+
+        }
+        String contatoTelefone = dto.getContatoTelefone().replaceAll("[^0-9]", "");
+
+        if (!contatoTelefone.isEmpty() && contatoTelefone.length() != 10) {
+            erros.add("O número do telefone tem 10 dígitos!");
+        }
+        if (!erros.isEmpty()) {
+            throw new MultiplasRegrasException(erros);
         }
 
         Contato contato = new Contato();
@@ -47,11 +64,11 @@ public class ContatoService {
     public List<Contato> listarTodos() {
         return contatoRepository.findAll();
     }
+
     public Contato buscarPorId(Long id) {
         return contatoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contato não encontrado!"));
+                .orElseThrow(() -> new ContatoNaoEncontradoException("Contato não encontrado!"));
     }
-
 
 
 }

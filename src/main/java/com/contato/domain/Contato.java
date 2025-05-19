@@ -25,11 +25,12 @@ public class Contato {
     @Column(name = "contato_nome", unique = true, length = 100)
     private String contatoNome;
 
-    @Email(message = "Email inválido")
+    @Email(message = "Email precisa está em formato de email")
+
     @Column(name = "contato_email", unique = true, length = 255)
     private String contatoEmail;
 
-    @NotBlank(message = "Numero de Celular é obrigatório")
+    @NotBlank(message = "Número de Celular é obrigatório")
     @Column(name = "contato_celular", unique = true, nullable = false, length = 11)
     private String contatoCelular;
     @Column(name="contato_telefone",length = 10)
