@@ -24,26 +24,36 @@ public class ContatoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(contato);
     }
 
+//    @GetMapping
+//    public ResponseEntity<List<Contato>> listarTodos() {
+//        List<Contato> contatos = contatoService.listarTodos();
+//        return ResponseEntity.ok(contatos);
+//    }
+
+    @GetMapping("/{contatoId}")
+    public ResponseEntity<Contato> buscarContato(@PathVariable Long contatoId) {
+        return ResponseEntity.ok(contatoService.buscarPorId(contatoId));
+    }
     @GetMapping
-    public ResponseEntity<List<Contato>> listarTodos() {
-        List<Contato> contatos = contatoService.listarTodos();
+    public ResponseEntity<List<Contato>> filtrar(
+            @RequestParam(required = false) String contatoNome,
+            @RequestParam(required = false) String contatoCelular) {
+
+        List<Contato> contatos = contatoService.filtrar(contatoNome, contatoCelular);
         return ResponseEntity.ok(contatos);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Contato> buscarContato(@PathVariable Long id) {
-        return ResponseEntity.ok(contatoService.buscarPorId(id));
-    }
 
-    @PutMapping("/{id}")
+
+    @PutMapping("/{contatoId}")
     public ResponseEntity<Contato> atualizarContato(@PathVariable Long contatoId, @RequestBody @Valid ContatoDTO dto) {
 
-        Contato contatoAtualizado = this.contatoService.enditarContato(contatoId, dto);
+        Contato contatoAtualizado = this.contatoService.atualizarContato(contatoId, dto);
         return ResponseEntity.ok(contatoAtualizado);
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{contatoId}")
     public ResponseEntity<Void> desativarContato(@PathVariable Long contatoId) {
         contatoService.desativarContato(contatoId);
         return ResponseEntity.noContent().build();

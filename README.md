@@ -1,6 +1,7 @@
-## Desafio Full-Stack (Spring Boot + Angular)
+## Projeto  Full-Stack (Spring Boot + Angular)
 
-Sistema Full Stack desenvolvido para cadastro, consulta, edição, inativação e marcação de contatos como favoritos. Utiliza Java com Spring Boot no backend, Angular no frontend, e PostgreSQL como banco de dados relacional.
+Sistema Full Stack desenvolvido para cadastro, consulta, edição, inativação e marcação de contatos como favoritos. 
+Utiliza Java com Spring Boot no backend, Angular no frontend, e PostgreSQL como banco de dados relacional.
 
 ## 🎥Vídeo do projeto
 
@@ -29,7 +30,7 @@ Sistema Full Stack desenvolvido para cadastro, consulta, edição, inativação 
 
 ## ⚙️ Funcionalidades
 
-✅Cadastro de Contatos (validação de duplicidade por número de celular)
+✅Cadastro de Contatos (validação de duplicidade por número de celular, nome do contato, email)
 
 ✅Consulta de contatos (ativos)
 

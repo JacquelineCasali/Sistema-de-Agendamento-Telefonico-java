@@ -23,15 +23,6 @@ public class ContatoService {
     public Contato salvar(ContatoDTO dto) {
 // armazena varias mensagens de erro
         List<String> erros = new ArrayList<>();
-        if (contatoRepository.existsByContatoNomeOrContatoEmail(
-                dto.getContatoNome(),
-                dto.getContatoEmail())) {
-            erros.add("Já existe um contato com esse nome ou email");
-
-        }
-        if (contatoRepository.existsByContatoCelular(dto.getContatoCelular())) {
-            erros.add("Número de celular já cadastrado");
-        }
 
         String contatoCelular = dto.getContatoCelular().replaceAll("[^0-9]", "");
         if (contatoCelular.length() != 11) {
@@ -42,6 +33,18 @@ public class ContatoService {
         if (!contatoTelefone.isEmpty() && contatoTelefone.length() != 10) {
             erros.add("O número do telefone tem 10 dígitos!");
         }
+
+        if (contatoRepository.existsByContatoNomeOrContatoEmail(
+                dto.getContatoNome(),
+                dto.getContatoEmail())) {
+            erros.add("Já existe um contato com esse nome ou email");
+
+        }
+        if (contatoRepository.existsByContatoCelular(contatoCelular)) {
+            erros.add("Número de celular já cadastrado");
+        }
+
+
         if (!erros.isEmpty()) {
             throw new MultiplasRegrasException(erros);
         }
@@ -58,47 +61,61 @@ public class ContatoService {
     }
 
     public List<Contato> listarTodos() {
-        return contatoRepository.findAll();
+        return contatoRepository.findByContatoSnAtivo("S");
     }
 
     public Contato buscarPorId(Long contatoId) {
         return contatoRepository.findById(contatoId)
                 .orElseThrow(() -> new ContatoNaoEncontradoException("Contato não encontrado!"));
     }
-public  Contato enditarContato (Long contatoId, ContatoDTO dto){
+    public List<Contato> filtrar(String contatoNome, String contatoCelular) {
+        String nome = (contatoNome == null || contatoNome.isBlank()) ? null : "%" + contatoNome.toLowerCase() + "%";
+        String celular = (contatoCelular == null || contatoCelular.isBlank()) ? null : "%" + contatoCelular + "%";
+        List<Contato> contatos = contatoRepository.filtrar(nome, celular);
+if(contatos.isEmpty()){
+    throw new ContatoNaoEncontradoException("Contato não encontrado!");
+}
+        return contatos;
+    }
+    public Contato atualizarContato(Long contatoId, ContatoDTO dto) {
         Contato contato = contatoRepository.findById(contatoId).orElseThrow(() -> new ContatoNaoEncontradoException("Contato não encontrado com o ID: " + contatoId));
-    List<String> erros = new ArrayList<>();
-    if (contatoRepository.existsByContatoNomeOrContatoEmail(
-            dto.getContatoNome(),
-            dto.getContatoEmail())) {
-        erros.add("Já existe um contato com esse nome ou email");
+        List<String> erros = new ArrayList<>();
+        String contatoCelular = dto.getContatoCelular().replaceAll("[^0-9]", "");
+        if (contatoCelular.length() != 11) {
+            erros.add("O número do celular deve conter 11 digitos!");
 
-    }
-    if (contatoRepository.existsByContatoCelular(dto.getContatoCelular())) {
-        erros.add("Número de celular já cadastrado");
-    }
+        }
+        String contatoTelefone = dto.getContatoTelefone().replaceAll("[^0-9]", "");
+        if (!contatoTelefone.isEmpty() && contatoTelefone.length() != 10) {
+            erros.add("O número do telefone tem 10 dígitos!");
+        }
 
-    String contatoCelular = dto.getContatoCelular().replaceAll("[^0-9]", "");
-    if (contatoCelular.length() != 11) {
-        erros.add("O número do celular deve conter 11 digitos!");
 
-    }
-    String contatoTelefone = dto.getContatoTelefone().replaceAll("[^0-9]", "");
-    if (!contatoTelefone.isEmpty() && contatoTelefone.length() != 10) {
-        erros.add("O número do telefone tem 10 dígitos!");
-    }
-    if (!erros.isEmpty()) {
-        throw new MultiplasRegrasException(erros);
-    }
+        if (contatoRepository.existsByContatoNomeAndContatoIdNot(dto.getContatoNome(), contatoId)) {
+            erros.add("Já existe um contato com esse nome");
+        }
 
-    contato.setContatoNome(dto.getContatoNome());
-    contato.setContatoEmail(dto.getContatoEmail());
-    contato.setContatoCelular(contatoCelular);
-    contato.setContatoTelefone(dto.getContatoTelefone());
-    contato.setContatoSnFavorito(dto.getContatoSnFavorito() != null ? dto.getContatoSnFavorito() : "N");
-    contato.setContatoSnAtivo("S");
-    contato.setContatoDhCad(LocalDateTime.now());
-    return contatoRepository.save(contato);
+        if (contatoRepository.existsByContatoEmailAndContatoIdNot(dto.getContatoEmail(), contatoId)) {
+            erros.add("Já existe um contato com esse email");
+        }
+
+        if (contatoRepository.existsByContatoCelularAndContatoIdNot(contatoCelular, contatoId)) {
+            erros.add("Número de celular já cadastrado");
+        }
+
+
+        if (!erros.isEmpty()) {
+            throw new MultiplasRegrasException(erros);
+        }
+
+        contato.setContatoNome(dto.getContatoNome());
+        contato.setContatoEmail(dto.getContatoEmail());
+        contato.setContatoCelular(contatoCelular);
+        contato.setContatoTelefone(dto.getContatoTelefone());
+        contato.setContatoSnFavorito(dto.getContatoSnFavorito() != null ? dto.getContatoSnFavorito() : "N");
+        contato.setContatoSnAtivo("S");
+        contato.setContatoDhCad(LocalDateTime.now());
+        return contatoRepository.save(contato);
     }
 
     public void desativarContato(Long contatoId) {
