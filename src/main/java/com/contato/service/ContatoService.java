@@ -60,9 +60,9 @@ public class ContatoService {
         return contatoRepository.save(contato);
     }
 
-    public List<Contato> listarTodos() {
-        return contatoRepository.findByContatoSnAtivo("S");
-    }
+//    public List<Contato> listarTodos() {
+//        return contatoRepository.findByContatoSnAtivo("S");
+//    }
 
     public Contato buscarPorId(Long contatoId) {
         return contatoRepository.findById(contatoId)
@@ -117,7 +117,15 @@ if(contatos.isEmpty()){
         contato.setContatoDhCad(LocalDateTime.now());
         return contatoRepository.save(contato);
     }
+// favoritar e desfavoritar
+public Contato alternarFavorito(Long contatoId) {
+    Contato contato = contatoRepository.findById(contatoId)
+            .orElseThrow(() -> new ContatoNaoEncontradoException("Contato não encontrado."));
 
+    String status = contato.getContatoSnFavorito();
+    contato.setContatoSnFavorito("S".equals(status) ? "N" : "S");
+    return contatoRepository.save(contato);
+}
     public void desativarContato(Long contatoId) {
         Contato contato = contatoRepository.findById(contatoId)
                 .orElseThrow(() -> new ContatoNaoEncontradoException("Contato com ID " + contatoId + " não encontrado."));

@@ -52,6 +52,13 @@ public class ContatoController {
         return ResponseEntity.ok(contatoAtualizado);
 
     }
+// favoritar e desfavoritar
+    @PatchMapping("/{contatoId}/favorito")
+    public ResponseEntity<Contato> favoritarDesfavoritar(@PathVariable Long contatoId) {
+        Contato contatoFavorito = this.contatoService.alternarFavorito(contatoId);
+        return ResponseEntity.ok(contatoFavorito);
+
+    }
 
     @DeleteMapping("/{contatoId}")
     public ResponseEntity<Void> desativarContato(@PathVariable Long contatoId) {
